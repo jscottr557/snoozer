@@ -6,8 +6,12 @@ use std::env;
 
 use commands::Commands;
 mod commands;
+
+mod register;
+mod unregister;
+mod invalid;
+
 fn main() {
-    //login
     let token: &str = &env::var("DISCORD_BOT_TOKEN").expect("DISCORD_BOT_TOKEN envvar not present");
     let discord = Discord::from_bot_token(token).expect("bot login failed!");
 
@@ -18,12 +22,12 @@ fn main() {
         Ok(Event::MessageCreate(message)) => {
             let message_content = &message.content;
             if commands::string_is_command(message_content) {
-                let (command, _arguments) = commands::parse_command(message_content);
+                let (command, arguments) = commands::parse_command(message_content);
                 match command {
                     Commands::QUIT => {break},
-                    Commands::REGISTER => {println!("register")},
-                    Commands::UNREGISTER => {println!("unregister")},
-                    Commands::INVAL => {println!("invalid")},
+                    Commands::REGISTER => {register::register(&message, arguments)},
+                    Commands::UNREGISTER => {unregister::unregister(&message, arguments)},
+                    Commands::INVAL => {invalid::invalid()},
                 }
             }
         }
